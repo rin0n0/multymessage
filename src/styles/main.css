@@ -1,0 +1,281 @@
+@font-face {
+    font-family: 'Montserrat';
+    src: 
+    url('./fonts/Montserrat-VariableFont_wght.ttf');
+    font-display: swap;
+}
+
+/* src/assets/styles/main.css */
+
+/*
+  ==============================================================
+  1. Глобальные CSS-переменные (Custom Properties)
+  ==============================================================
+  Используйте их для централизованного управления цветами, шрифтами,
+  отступами и т.д. Это упрощает изменения и поддерживает согласованность.
+*/
+:root {
+  /* Цвета */
+  --color-primary: #BACFB6; 
+  --color-secondary: ##C1C1C1; 
+  --color-text: #000;
+  --color-background: #fff;
+  --color-border: #eee;
+
+  /* Шрифты */
+  --font-family-base: 'Roboto', Arial, sans-serif; /* Пример с Roboto, если используете Google Fonts */
+  /* Если вы подключали свой кастомный шрифт, используйте его имя: */
+  --font-family-base: 'Montserrat', Arial, sans-serif; 
+  --font-family-heading: var(--font-family-base);
+
+  /* Размеры шрифтов (mobile-first) */
+  --font-size-base: 16px;
+  --font-size-h1: 2.5rem;
+  --font-size-h2: 2rem;
+  --font-size-h3: 1.75rem;
+  --font-size-h4: 1.5rem;
+  --font-size-h5: 1.25rem;
+  --font-size-h6: 1rem;
+
+  /* Межстрочный интервал */
+  --line-height-base: 1.6;
+  --line-height-heading: 1.2;
+
+  /* Отступы/пространства */
+  --spacing-xs: 0;
+  --spacing-sm: 0;
+  --spacing-md: 0;
+  --spacing-lg: 0;
+  --spacing-xl: 0;
+  --spacing-xxl: 0;
+
+  /* Максимальная ширина контента */
+  --container-max-width: 1200px;
+}
+
+/*
+  ==============================================================
+  2. Обнуление/Нормализация стилей (CSS Reset)
+  ==============================================================
+  Базовые правила для обнуления стандартных стилей браузеров,
+  чтобы обеспечить более предсказуемое поведение и упростить кроссбраузерную разработку.
+*/
+
+/* Применение border-box ко всем элементам */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Сброс стандартных стилей html и body */
+html {
+  font-size: var(--font-size-base); /* Устанавливаем базовый размер шрифта для rem */
+  line-height: var(--line-height-base);
+  scroll-behavior: smooth; /* Плавный скролл по якорям */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family-base);
+  font-size: 1rem; /* Относительно font-size-base */
+  color: var(--color-text);
+  background-color: var(--color-background);
+  min-height: 100vh; /* Гарантируем, что body занимает всю высоту viewport */
+  display: flex; /* Для использования flexbox на уровне body, если нужно центрировать контент */
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased; /* Улучшенное сглаживание шрифтов на macOS/iOS */
+  -moz-osx-font-smoothing: grayscale; /* Улучшенное сглаживание шрифтов на macOS/iOS */
+}
+
+/* Сброс стилей для заголовков, параграфов и списков */
+h1, h2, h3, h4, h5, h6, p, ul, ol, dl, figure, blockquote {
+  margin: 0;
+  padding: 0;
+}
+
+ul, ol {
+  list-style: none; /* Убираем стандартные маркеры/нумерацию списков */
+}
+
+/* Сброс стилей для ссылок */
+a {
+  color: var(--color-primary);
+  text-decoration: none; /* Убираем подчеркивание */
+  transition: color 0.3s ease; /* Плавный переход цвета при наведении */
+  margin: 0;
+}
+
+a:hover,
+a:focus {
+  color: var(--color-secondary);
+  text-decoration: underline; /* Подчеркивание при наведении */
+}
+
+/* Стилизация изображений для адаптивности */
+img, video, canvas, svg {
+  max-width: 100%; /* Изображения не выходят за пределы родителя */
+  height: auto; /* Сохраняем пропорции */
+  display: block; /* Убираем лишний пробел под изображениями */
+}
+
+/* Стилизация элементов форм */
+button, input, select, textarea {
+  font-family: inherit; /* Наследуем шрифт от body */
+  font-size: 1rem; /* Наследуем размер шрифта */
+  margin: 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+button {
+  cursor: pointer;
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+button:hover {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+}
+
+/* Стили для таблиц */
+table {
+  border-collapse: collapse; /* Схлопывание границ ячеек */
+  width: 100%;
+}
+
+/* Стили для элементов семантики HTML5 */
+article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
+  display: block; /* Убеждаемся, что эти элементы ведут себя как блочные */
+}
+
+/*
+  ==============================================================
+  3. Типографика
+  ==============================================================
+  Базовые стили для заголовков и параграфов.
+*/
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-heading);
+  line-height: var(--line-height-heading);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-secondary);
+}
+
+h1 { font-size: var(--font-size-h1); }
+h2 { font-size: var(--font-size-h2); }
+h3 { font-size: var(--font-size-h3); }
+h4 { font-size: var(--font-size-h4); }
+h5 { font-size: var(--font-size-h5); }
+h6 { font-size: var(--font-size-h6); }
+
+p {
+  margin-bottom: var(--spacing-md);
+}
+
+/*
+  ==============================================================
+  4. Общие классы макета и утилиты
+  ==============================================================
+*/
+
+/* Контейнер для центрирования контента и ограничения ширины */
+.container {
+  max-width: var(--container-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-md); /* Отступ по бокам для меньших экранов */
+  padding-right: var(--spacing-md);
+  width: 100%; /* Занимает всю доступную ширину до max-width */
+}
+
+/* Утилиты для выравнивания текста */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+/* Утилиты для Flexbox */
+.flex { display: flex; }
+.flex-column { flex-direction: column; }
+.justify-center { justify-content: center; }
+.align-center { align-items: center; }
+.flex-grow { flex-grow: 1; }
+
+/*
+  ==============================================================
+  5. Адаптивный дизайн (Медиа-запросы - Mobile First)
+  ==============================================================
+  Стили определяются сначала для маленьких экранов, а затем
+  переопределяются для больших.
+*/
+
+/* Точки останова (breakpoints) */
+/*
+  Mobile: < 600px
+  Tablet: 600px - 900px
+  Desktop: 901px - 1200px
+  Large Desktop: > 1200px
+*/
+
+/* @media (min-width: Xpx) {} означает "начиная с ширины Xpx и больше" */
+
+/* Для планшетов и больше (600px и выше) */
+@media (min-width: 600px) {
+  :root {
+    --font-size-base: 17px; /* Немного увеличиваем базовый размер шрифта */
+    --font-size-h1: 2.8rem;
+    --font-size-h2: 2.3rem;
+  }
+  .container {
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
+  }
+}
+
+/* Для десктопов и больше (901px и выше) */
+@media (min-width: 901px) {
+  :root {
+    --font-size-base: 18px; /* Еще увеличиваем базовый размер шрифта */
+    --font-size-h1: 3.2rem;
+    --font-size-h2: 2.6rem;
+  }
+  .container {
+    padding-left: var(--spacing-xl);
+    padding-right: var(--spacing-xl);
+  }
+}
+
+/* Для больших десктопов (1200px и выше) */
+@media (min-width: 1200px) {
+  /* Здесь можно установить, например, более крупные шрифты или отступы для очень больших экранов */
+  :root {
+    --font-size-h1: 3.5rem;
+  }
+}
+
+/* Пример скрытия элементов на определенных размерах экрана */
+.hide-on-mobile {
+  display: block;
+}
+@media (max-width: 599px) {
+  .hide-on-mobile {
+    display: none;
+  }
+}
+
+.hide-on-desktop {
+  display: none;
+}
+@media (max-width: 900px) {
+  .hide-on-desktop {
+    display: block;
+  }
+}
