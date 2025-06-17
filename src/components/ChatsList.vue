@@ -7,11 +7,12 @@
             </div>
             <div class="chatlist__chat__meta">
                 <div class="chatlist__chat__meta__top">
-                    <h1>Чат №{{chat.chatId}}</h1>
+                    <h1>Чат #{{chat.chatId}}</h1>
                     <p>{{chat.date}}</p>
                 </div>
                 <div class="chatlist__chat__meta__bottom">
                     <p >{{ chat.messages.at(-1).text }}</p>
+                    <button @click="deleteChat(chat.chatId)">&#x2715;</button>
                 </div>
             </div>
         </div>
@@ -29,7 +30,7 @@
 
     const store = useStore()
     const {chats} = storeToRefs(store)
-    const {changeChat, newChat} = store;
+    const {changeChat, newChat, deleteChat} = store;
 </script>
 
 <style scoped>
@@ -109,9 +110,17 @@
 
 .chatlist__chat__meta__bottom {
     font-size: 14px;
-    width: 80%;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
     color: #555;
     margin-top: 5px;
+}
+
+.chatlist__chat__meta__bottom button{
+    font-size: 10px;
+    padding: 5px;
+    color:black;
 }
 
 .chatlist__chat__meta__bottom p{

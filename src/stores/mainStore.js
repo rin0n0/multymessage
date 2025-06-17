@@ -30,6 +30,9 @@ export const useStore = defineStore('store', {
         newChat(model){
             this.chats.push({chatId: ChatId++, messages: [{msgId: MessageId++, text: "Привет!", sender: model}], model, date: getFormattedDate()})
             this.currentСhatId = MessageId-1;
+        },
+        deleteChat(id){
+            this.chats = this.chats.filter(chat => chat.chatId !== id);
         }
     }
 })
