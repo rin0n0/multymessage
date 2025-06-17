@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
-//let chatId = 1;
-let messageId = 2;
+let ChatId = 2;
+let MessageId = 2;
 
 export const useStore = defineStore('store', {
     state: () => ({
@@ -57,7 +57,17 @@ export const useStore = defineStore('store', {
         },
         newMessage(text) {
             if (!text) return
-            this.currentСhatMessages.push({msgId: messageId++, text, sender: "user"})
+            this.currentСhatMessages.push({msgId: MessageId++, text, sender: "user"})
+        },
+        newChat(model){
+            this.chats.push({chatId: ChatId++, messages: [{msgId: MessageId++, text: "Привет!", sender: model}], model, date: getFormattedDate()})
         }
     }
 })
+
+function getFormattedDate() {
+  const today = new Date();
+  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  return `${day}.${month}`;
+}

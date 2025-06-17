@@ -40,7 +40,7 @@
     border-radius: 15px 15px 15px 0;
     max-width: 60%;
 }
-.gemeni {
+.gemini {
     align-self: flex-start;
     background-color: #c1b8e4;
     padding: 12px 18px;

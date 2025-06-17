@@ -14,6 +14,10 @@
                 </div>
             </div>
         </div>
+        <div class="chatlist__add">
+            <button @click="newChat('gpt')">Gpt</button>
+            <button @click="newChat('gemini')">Gemini</button>
+        </div>
     </div>
 </template>
 
@@ -23,7 +27,7 @@
 
     const store = useStore()
     const {chats} = storeToRefs(store)
-    const {changeChat} = store;
+    const {changeChat, newChat} = store;
 </script>
 
 <style scoped>
@@ -36,6 +40,16 @@
     overflow: hidden;
     border-right: 1px solid #ccc;
 }
+
+.chatlist__add{
+    width: 100%;
+    display: flex;
+    gap: 2%;
+}
+.chatlist__add button{
+    flex:1;
+}
+
 
 .chatlist__chat {
     display: flex;
