@@ -10,8 +10,10 @@
             <p v-if="activePage==='main'" @click="changePage">Вход</p>
             <p  v-if="activePage==='login'" @click="changePage">Назад</p>
             <img @click="changePage" src="../assets/login.png" alt="log" id="log">
-            <img src="../assets/gemini.png" alt="gpt">
-            <img src="../assets/gpt.png" alt="gemeni">
+            <img v-if="tokenGemini==''" src="../assets/gemini.png" alt="gemini">
+            <img v-else src="../assets/gemini_active.png" alt="gemini">
+            <img v-if="tokenGpt ==''" src="../assets/gpt.png" alt="gpt">
+            <img v-else src="../assets/gpt_active.png" alt="gpt">
         </div>
     </nav>
 </template>
@@ -21,7 +23,7 @@ import { useStore } from '../stores/mainStore'
 import { storeToRefs } from 'pinia'
 
 const store = useStore();
-const {activePage} = storeToRefs(store);
+const {activePage, tokenGemini,tokenGpt} = storeToRefs(store);
 const {changePage} = store;
 </script>
 
