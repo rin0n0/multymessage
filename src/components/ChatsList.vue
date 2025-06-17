@@ -11,7 +11,7 @@
                     <p>{{chat.date}}</p>
                 </div>
                 <div class="chatlist__chat__meta__bottom">
-                    <p >{{ chat.messages.at(-1).text }}</p>
+                    <span >{{ chat.messages.at(-1).text }}</span>
                     <button @click="deleteChat(chat.chatId)">&#x2715;</button>
                 </div>
             </div>
@@ -119,12 +119,14 @@
 
 .chatlist__chat__meta__bottom button{
     font-size: 10px;
-    padding: 5px;
+    width: 20px;
+    height: 20px;
     color:black;
 }
 
-.chatlist__chat__meta__bottom p{
+.chatlist__chat__meta__bottom span{
     overflow: hidden;
+    height: 40px;
 }
 
 </style>
