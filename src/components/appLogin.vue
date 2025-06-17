@@ -22,7 +22,7 @@
 
       <button type="submit" class="login-form__button">Сохранить токен</button>
 
-      <a href="#" class="login-form__link">как получить токен?</a>
+      <a target="_blank" href="https://docs.google.com/document/d/15y8hTKGTWBbTZITkLnNtly_z5lwKGQwRVJ27GcYt3KI/edit?usp=sharing" class="login-form__link">как получить токен?</a>
     </form>
   </div>
 </template>

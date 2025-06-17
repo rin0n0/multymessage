@@ -126,6 +126,7 @@
 
 .chatlist__chat__meta__bottom span{
     overflow: hidden;
+    width: 80%;
     height: 40px;
 }
 

@@ -1,53 +1,101 @@
 import { defineStore } from "pinia";
 
-const API_URL = 'https://nexra.aryahcr.cc/api/chat/gptweb';
-const TASK_URL = 'https://nexra.aryahcr.cc/api/chat/task';
+const API_URL_GPT = 'https://nexra.aryahcr.cc/api/chat/gptweb';
+const TASK_URL_GPT = 'https://nexra.aryahcr.cc/api/chat/task';
+const API_URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=GEMINI_API_KEY"
 
-async function waitForResult(taskId) {
-    for (let i = 0; i < 30; i++) { 
+async function waitForGptResult(taskId) {
+    for (let i = 0; i < 30; i++) {
         await new Promise(resolve => setTimeout(resolve, 500));
-        
         try {
-            const response = await fetch(`${TASK_URL}/${encodeURIComponent(taskId)}`);
+            const response = await fetch(`${TASK_URL_GPT}/${encodeURIComponent(taskId)}`);
             if (!response.ok) {
-                console.error(`Ошибка проверки задачи: Статус ${response.status}`);
+                console.error(`Ошибка проверки задачи GPT: Статус ${response.status}`);
                 continue;
             }
-
             const data = await response.json();
-            
-            console.log('Статус задачи:', data);
-            
             if (data.status === 'completed') {
-                return data; 
+                return data;
             } else if (data.status === 'error') {
-                throw new Error(data.error || 'Ошибка обработки задачи на сервере');
+                throw new Error(data.error || 'Ошибка обработки задачи GPT на сервере');
             }
         } catch (error) {
-            console.error('Критическая ошибка при проверке задачи:', error);
-            if (i === 29) throw error; 
+            console.error('Критическая ошибка при проверке задачи GPT:', error);
+            if (i === 29) throw error;
         }
     }
-    throw new Error('Превышено время ожидания ответа от API');
+    throw new Error('Превышено время ожидания ответа от GPT API');
 }
 
+async function callGptApi(prompt) {
+    const response = await fetch(API_URL_GPT, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            prompt: prompt,
+            markdown: false
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Ошибка при создании задачи GPT: статус ${response.status}`);
+    }
+    const data = await response.json();
+    if (!data.id) {
+        throw new Error('API GPT не вернуло ID задачи');
+    }
+    const result = await waitForGptResult(data.id);
+    if (result?.gpt) {
+        return result.gpt;
+    } else {
+        throw new Error('API GPT вернуло пустой ответ');
+    }
+}
+
+async function callGeminiApi(messages, apiKey) {
+    if (!apiKey) {
+        throw new Error('Отсутствует токен для Gemini API. Добавьте его в хранилище.');
+    }
+    const contents = messages.map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.text }]
+    }));
+    const response = await fetch(`${API_URL_GEMINI}${apiKey}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ contents })
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Ошибка Gemini API: ${errorData.error?.message || response.statusText}`);
+    }
+    const data = await response.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) {
+        throw new Error('Gemini API вернуло пустой или некорректный ответ.');
+    }
+    return text;
+}
 
 export const useStore = defineStore('store', {
     state: () => ({
         chats: [],
-        tokenGemini: '',
+        tokenGemini: 'AIzaSyBCOo8nssaAiEw1DRg5gkP7PksazQoyDcE',
         tokenGpt: '',
-        currentСhatId: '',
+        currentСhatId: null,
         activePage: 'main',
     }),
     persist: true,
     getters: {
-        currentСhat: (state) => {
-            return state.chats.find(chat => chat.chatId === state.currentСhatId);
+        currentChat: (state) => {
+            return state.chats.find(chat => chat.chatId === state.currentСhatId) || null;
         },
         currentСhatMessages() {
-            const currentChat = this.currentСhat;
-            return currentChat ? currentChat.messages : undefined;
+            return this.currentChat ? this.currentChat.messages : [];
         },
     },
     actions: {
@@ -62,90 +110,79 @@ export const useStore = defineStore('store', {
             const maxId = Math.max(...allMessages.map(msg => msg.msgId));
             return maxId + 1;
         },
-
         changeChat(id) {
             this.currentСhatId = id;
         },
+        async newMessage(text) {
+            if (!text || !this.currentChat) return;
 
-        newMessage(text) {
-            if (!text || !this.currentСhatMessages) return;
-            const newMsgId = this._getNextMessageId();
-            this.currentСhatMessages.push({msgId: newMsgId, text, sender: "user"});
+            const model = this.currentChat.model;
+            this.currentСhatMessages.push({
+                msgId: this._getNextMessageId(),
+                text,
+                sender: "user"
+            });
 
-            if (this.currentСhat?.model === 'gpt') {
-                this.getGptResponse();
-            }
-        },
-
-        async getGptResponse() {
-            if (!this.currentСhatMessages) return;
-            const typingMessageId = this._getNextMessageId();
-            const typingMessage = { msgId: typingMessageId, text: "печатает...", sender: "gpt", isTyping: true };
-            this.currentСhatMessages.push(typingMessage);
-
-            const prompt = "не используй markdown!" + this.currentСhatMessages
-                .filter(msg => !msg.isTyping)
-                .map(msg => `${msg.sender}: ${msg.text}`)
-                .join('\n');
-            
-            console.log("Отправка промпта в API:", prompt);
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt, markdown: false })
+            if (model === 'gpt' || model === 'gemini') {
+                const responseMsgId = this._getNextMessageId();
+                this.currentСhatMessages.push({
+                    msgId: responseMsgId,
+                    text: 'печатает...',
+                    sender: model,
+                    loading: true
                 });
 
-                if (!response.ok) throw new Error(`Ошибка API: ${response.statusText}`);
+                try {
+                    let responseText = '';
+                    const conversationHistory = this.currentСhatMessages.filter(m => !m.loading);
 
-                const data = await response.json();
-                if (!data.id) throw new Error('API не вернул ID задачи');
-
-                const result = await waitForResult(data.id);
-
-                if (result?.gpt) {
-                    const typingMsgIndex = this.currentСhatMessages.findIndex(m => m.msgId === typingMessage.msgId);
-                    if (typingMsgIndex !== -1) {
-                         this.currentСhatMessages[typingMsgIndex] = { msgId: typingMessage.msgId, text: result.gpt, sender: "gpt"};
+                    if (model === 'gpt') {
+                        let prompt = conversationHistory.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
+                        prompt += `\n${model}:`;
+                        responseText = await callGptApi(prompt);
+                    } else if (model === 'gemini') {
+                        responseText = await callGeminiApi(conversationHistory, this.tokenGemini);
                     }
-                } else {
-                    throw new Error('Пустой ответ от API');
-                }
-
-            } catch (error) {
-                console.error("Ошибка при получении ответа от GPT:", error);
-                const typingMsgIndex = this.currentСhatMessages.findIndex(m => m.msgId === typingMessage.msgId);
-                if (typingMsgIndex !== -1) {
-                    this.currentСhatMessages[typingMsgIndex] = { msgId: typingMessage.msgId, text: `Ошибка: ${error.message}`, sender: "gpt", isError: true };
+                    const responseMessage = this.currentСhatMessages.find(m => m.msgId === responseMsgId);
+                    if (responseMessage) {
+                        responseMessage.text = responseText.trim();
+                        delete responseMessage.loading;
+                    }
+                } catch (error) {
+                    console.error(`Ошибка при получении ответа от ${model}:`, error);
+                    const responseMessage = this.currentСhatMessages.find(m => m.msgId === responseMsgId);
+                    if (responseMessage) {
+                        responseMessage.text = `Произошла ошибка: ${error.message}`;
+                        responseMessage.error = true;
+                        delete responseMessage.loading;
+                    }
                 }
             }
         },
-
-        newChat(model){
+        newChat(model) {
             const newId = this._getNextChatId();
-            const firstMsgId = this._getNextMessageId();
-
             this.chats.push({
-                chatId: newId, 
-                messages: [{msgId: firstMsgId, text: "Проси, что хочешь!", sender: model}], 
-                model, 
+                chatId: newId,
+                messages: [{
+                    msgId: this._getNextMessageId(),
+                    text: "Проси, что хочешь!",
+                    sender: model
+                }],
+                model,
                 date: getFormattedDate()
             });
             this.currentСhatId = newId;
         },
-
-        deleteChat(id){
+        deleteChat(id) {
             this.chats = this.chats.filter(chat => chat.chatId !== id);
             if (this.currentСhatId === id) {
-                this.currentСhatId = this.chats.length > 0 ? this.chats[0].chatId : '';
+                this.currentСhatId = this.chats.length > 0 ? this.chats[0].chatId : null;
             }
         },
-        changePage(){
-            if (this.activePage==='main') this.activePage='login';
-            else if (this.activePage==='login') this.activePage='main';
+        changePage() {
+            this.activePage = this.activePage === 'main' ? 'login' : 'main';
         },
-        saveTokens(geminiToken,gptToken){
+        saveTokens(geminiToken, gptToken) {
             this.tokenGemini = geminiToken;
             this.tokenGpt = gptToken;
         },
@@ -153,8 +190,8 @@ export const useStore = defineStore('store', {
 })
 
 function getFormattedDate() {
-  const today = new Date();
-  const day = String(today.getDate()).padStart(2, '0');
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  return `${day}.${month}`;
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    return `${day}.${month}`;
 }
