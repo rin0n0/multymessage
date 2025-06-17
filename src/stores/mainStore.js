@@ -35,9 +35,10 @@ async function waitForResult(taskId) {
 export const useStore = defineStore('store', {
     state: () => ({
         chats: [],
-        tokenGemeni: '',
+        tokenGemini: '',
         tokenGpt: '',
         currentСhatId: '',
+        activePage: 'main',
     }),
     persist: true,
     getters: {
@@ -139,7 +140,15 @@ export const useStore = defineStore('store', {
             if (this.currentСhatId === id) {
                 this.currentСhatId = this.chats.length > 0 ? this.chats[0].chatId : '';
             }
-        }
+        },
+        changePage(){
+            if (this.activePage==='main') this.activePage='login';
+            else if (this.activePage==='login') this.activePage='main';
+        },
+        saveTokens(geminiToken,gptToken){
+            this.tokenGemini = geminiToken;
+            this.tokenGpt = gptToken;
+        },
     }
 })
 
