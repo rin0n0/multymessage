@@ -1,5 +1,6 @@
 <template>
     <div class="chatlist">
+        <div v-if="chats">
         <div class="chatlist__chat" @click="changeChat(chat.chatId)" v-for="chat in chats" :key="chat.id" :class="chat.model">
             <div class="chatlist__chat__left">
                 <div class="chatlist__chat__img"></div>
@@ -10,9 +11,10 @@
                     <p>{{chat.date}}</p>
                 </div>
                 <div class="chatlist__chat__meta__bottom">
-                    <p>{{ chat.messages.at(-1).text }}</p>
+                    <p >{{ chat.messages.at(-1).text }}</p>
                 </div>
             </div>
+        </div>
         </div>
         <div class="chatlist__add">
             <button @click="newChat('gpt')">Gpt</button>
