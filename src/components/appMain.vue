@@ -11,7 +11,7 @@
     import ChatBlock from './ChatBlock.vue';
     import Login from './appLogin.vue';
     import { useStore } from '../stores/mainStore'
-    
+    import {storeToRefs} from 'pinia'
 
     const store = useStore()
     const {activePage} = storeToRefs(store)
