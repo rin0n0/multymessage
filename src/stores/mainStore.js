@@ -12,6 +12,7 @@ export const useStore = defineStore('store', {
         tokenGpt: '',
         currentСhatId: '',
     }),
+    persist: true,
     getters: {
         currentСhatMessages: (state) => {
             const currentСhat = state.chats.find(chat => chat.chatId === state.currentСhatId);

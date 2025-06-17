@@ -1,5 +1,5 @@
-<template>
-    <form @submit.prevent="handleNewMessage">
+<template>    
+    <form v-if="chats[0]" @submit.prevent="handleNewMessage">
         <input type="text" v-model="msg" placeholder="Введите сообщение...">
         <button type="submit"></button>
     </form>
@@ -7,10 +7,12 @@
 
 <script setup>
     import { useStore } from '../stores/mainStore'
-    import { defineModel } from 'vue';
+    import { storeToRefs } from 'pinia'
+    import { defineModel } from 'vue'
 
     const msg = defineModel({type: String})
     const store = useStore()
+    const {chats} = storeToRefs(store)
     const {newMessage} = store;
 
     function handleNewMessage() {
