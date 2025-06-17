@@ -7,8 +7,7 @@
           <img v-if="tokenGpt == ''" src="../assets/gpt.png">
           <img v-else src="../assets/gpt_active.png">
         </div>
-        <input v-model="gptToken" type="text" class="input-group__input" placeholder="Токен ChatGPT"
-          aria-label="Токен ChatGPT" />
+        <input v-model="gptToken" type="text" class="input-group__input" placeholder="Введите токен ChatGPT"/>
       </div>
 
       <div class="input-group">
@@ -16,8 +15,7 @@
           <img v-if="tokenGemini == ''" src="../assets/gemini.png">
           <img v-else src="../assets/gemini_active.png">
         </div>
-        <input v-model="geminiToken" type="text" class="input-group__input" placeholder="Токен Gemini"
-          aria-label="Токен Gemini" />
+        <input v-model="geminiToken" type="text" class="input-group__input" placeholder="Введите токен Gemini"/>
       </div>
 
       <button type="submit" class="login-form__button">Сохранить токен</button>
@@ -40,9 +38,6 @@ const geminiToken = ref('');
 
 const saveTokens = (gemini, gpt) => {
   store.saveTokens(gemini, gpt);
-
-  gptToken.value = '';
-  geminiToken.value = '';
 };
 
 </script>

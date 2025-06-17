@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
+import { GoogleGenAI } from "@google/genai";
 
 const API_URL_GPT = 'https://nexra.aryahcr.cc/api/chat/gptweb';
 const TASK_URL_GPT = 'https://nexra.aryahcr.cc/api/chat/task';
-const API_URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=GEMINI_API_KEY"
 
 async function waitForGptResult(taskId) {
     for (let i = 0; i < 30; i++) {
@@ -34,8 +34,8 @@ async function callGptApi(prompt) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            prompt: prompt,
-            markdown: false
+            prompt: "main_rule{Отвечай только простым текстом, без форматирования. Не используй Markdown в своем ответе. Пожалуйста, не используй жирный шрифт, курсив, списки или заголовки.}" + prompt,
+            markdown: false,
         })
     });
 
@@ -58,27 +58,16 @@ async function callGeminiApi(messages, apiKey) {
     if (!apiKey) {
         throw new Error('Отсутствует токен для Gemini API. Добавьте его в хранилище.');
     }
-    const contents = messages.map(msg => ({
-        role: msg.sender === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.text }]
-    }));
-    const response = await fetch(`${API_URL_GEMINI}${apiKey}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ contents })
-    });
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Ошибка Gemini API: ${errorData.error?.message || response.statusText}`);
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: messages,
+    config: {
+        systemInstruction: "Answer in plain text only, without formatting. Do not use Markdown in your answer. Please do not use bold, italics, lists, or headings.",
     }
-    const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) {
-        throw new Error('Gemini API вернуло пустой или некорректный ответ.');
-    }
-    return text;
+  });
+  return response.text;
+
 }
 
 export const useStore = defineStore('store', {
@@ -137,7 +126,7 @@ export const useStore = defineStore('store', {
                     const conversationHistory = this.currentСhatMessages.filter(m => !m.loading);
 
                     if (model === 'gpt') {
-                        let prompt = conversationHistory.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
+                        let prompt =  conversationHistory.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
                         prompt += `\n${model}:`;
                         responseText = await callGptApi(prompt);
                     } else if (model === 'gemini') {

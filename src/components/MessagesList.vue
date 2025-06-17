@@ -1,7 +1,7 @@
 <template>
     <div class="chat__messages">
         <div class="chat__message" v-for="message in currentСhatMessages" :key="message.msgId" :class="message.sender">
-            <p>{{ message.text }}</p>
+            <span>{{ String(message.text) }}</span>
         </div>
     </div>
 </template>
@@ -28,23 +28,24 @@
 .user {
     align-self: flex-end;
     background-color: #c0dfc4;
-    padding: 12px 18px;
-    border-radius: 15px 15px 0 15px;
-    max-width: 60%;
 }
 
 .gpt {
     align-self: flex-start;
     background-color: #ddd;
-    padding: 12px 18px;
-    border-radius: 15px 15px 15px 0;
-    max-width: 60%;
 }
 .gemini {
     align-self: flex-start;
     background-color: #c1b8e4;
+    
+}
+.gemini,
+.gpt,
+.user{
     padding: 12px 18px;
     border-radius: 15px 15px 15px 0;
     max-width: 60%;
+    overflow-wrap: break-word;
 }
+
 </style>
