@@ -108,10 +108,12 @@ a {
 }
 
 a:hover,
-a:focus {
-  color: var(--color-secondary);
-  text-decoration: underline; /* Подчеркивание при наведении */
+a:focus,
+a:active,
+a:visited {
+  text-decoration: none; 
 }
+
 
 /* Стилизация изображений для адаптивности */
 img, video, canvas, svg {

@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-    import ChatList from './ChatList.vue';
+    import ChatList from './ChatsList.vue';
     import ChatBlock from './ChatBlock.vue';
 </script>
 

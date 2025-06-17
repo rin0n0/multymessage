@@ -1,50 +1,72 @@
 <template>
     <div class="chatlist">
-        <div class="chatlist__chat">
-            <div class="chatlist__chat__img">
-                <img src="" alt="avatar">
+        <div class="chatlist__chat" @click="changeChat(chat.chatId)" v-for="chat in chats" :key="chat.id" :class="chat.model">
+            <div class="chatlist__chat__left">
+                <div class="chatlist__chat__img"></div>
             </div>
             <div class="chatlist__chat__meta">
                 <div class="chatlist__chat__meta__top">
-                    <h1>Название</h1>
-                    <img src="" alt="ischecked">
-                    <p>22:41</p>
+                    <h1>Чат №{{chat.chatId}}</h1>
+                    <p>{{chat.date}}</p>
                 </div>
                 <div class="chatlist__chat__meta__bottom">
-                    текст сообщения текст сообщения текст соо...
+                    <p>{{ chat.messages.at(-1).text }}</p>
                 </div>
             </div>
         </div>
     </div>
 </template>
 
+<script setup>
+    import { useStore } from '../stores/mainStore'
+    import { storeToRefs } from 'pinia'
+
+    const store = useStore()
+    const {chats} = storeToRefs(store)
+    const {changeChat} = store;
+</script>
+
 <style scoped>
 .chatlist {
-    width: 300px;
     background-color: #e6e6e6;
     padding: 10px;
-    overflow-y: auto;
+    width: 20%;
+    max-width: 300px;
+    min-width: 100px;
+    overflow: hidden;
     border-right: 1px solid #ccc;
 }
 
 .chatlist__chat {
     display: flex;
+    justify-content: space-between;
     padding: 10px;
+    width: 100%;
     border-radius: 8px;
     background-color: white;
     margin-bottom: 10px;
     cursor: pointer;
+    overflow: hidden;
 }
 
-.chatlist__chat__img img {
+.gpt .chatlist__chat__img{
+    background: url('../assets/gpt.png');
+    background-size: cover;
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    margin-right: 10px;
+}
+
+.gemini .chatlist__chat__img{
+    background: url('../assets/gemini.png');
+    background-size: cover;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
 }
 
 .chatlist__chat__meta {
-    flex: 1;
+    width: 80%;
 }
 
 .chatlist__chat__meta__top {
@@ -71,8 +93,13 @@
 
 .chatlist__chat__meta__bottom {
     font-size: 14px;
+    width: 80%;
     color: #555;
     margin-top: 5px;
+}
+
+.chatlist__chat__meta__bottom p{
+    overflow: hidden;
 }
 
 </style>

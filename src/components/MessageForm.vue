@@ -1,16 +1,26 @@
 <template>
-    <div class="chat__form">
-        <input type="text" placeholder="Введите сообщение...">
-        <button></button>
-    </div>
+    <form @submit.prevent="handleNewMessage">
+        <input type="text" v-model="msg" placeholder="Введите сообщение...">
+        <button type="submit"></button>
+    </form>
 </template>
 
 <script setup>
+    import { useStore } from '../stores/mainStore'
+    import { defineModel } from 'vue';
 
+    const msg = defineModel({type: String})
+    const store = useStore()
+    const {newMessage} = store;
+
+    function handleNewMessage() {
+        newMessage(msg.value.trim())
+        msg.value = '';
+    }
 </script>
 
 <style scoped>
-.chat__form {
+form {
     display: flex;
     align-items: center;
     padding: 10px 20px;
@@ -21,8 +31,8 @@
     border-top: 1px solid #ccc;
 }
 
-.chat__form input {
-    flex: 1;
+form input {
+    width: 90%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 20px;
@@ -30,9 +40,9 @@
     font-size: 14px;
 }
 
-.chat__form button {
-    width: 36px;
-    height: 36px;
+form button {
+    min-width: 36px;
+    min-height: 36px;
     margin-left: 10px;
     border-radius: 50%;
     background-color: #4CAF50;

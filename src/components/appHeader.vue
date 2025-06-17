@@ -7,7 +7,7 @@
         <div class="login">
             <p>Вход</p>
             <img src="../assets/login.png" alt="log" id="log">
-            <img src="../assets/gemeni.png" alt="gpt">
+            <img src="../assets/gemini.png" alt="gpt">
             <img src="../assets/gpt.png" alt="gemeni">
         </div>
     </nav>
@@ -27,6 +27,7 @@ nav {
 h1 {
     font-weight: 800;
     font-size: 20px;
+    user-select:none;
 }
 
 a {
@@ -47,6 +48,8 @@ a:hover {
 
 .login p {
     margin: 0;
+    user-select:none; 
+    cursor: pointer;
 }
 #log{
     margin-right: 1vw;
